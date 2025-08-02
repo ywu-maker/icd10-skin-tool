@@ -9,6 +9,9 @@
     input, select, button { font-size: 1rem; margin: 0.5rem; padding: 0.5rem; }
     #result { margin-top: 1rem; }
     #suggestion { color: gray; margin-top: 0.5rem; font-style: italic; cursor: pointer; }
+    #autocomplete-list { max-height: 150px; overflow-y: auto; border: 1px solid #ccc; margin-top: 5px; background: #fff; text-align: left; position: absolute; left: 50%; transform: translateX(-50%); width: 300px; }
+    .autocomplete-item { padding: 5px; cursor: pointer; }
+    .autocomplete-item:hover { background: #eee; }
   </style>
 </head>
 <body>
@@ -26,16 +29,19 @@
   <button onclick="copyText('code')">📋 ICD Code</button>
 
   <div id="suggestion"></div>
+  <div id="autocomplete-list"></div>
   <div id="result"></div>
 
   <script type="module">
     import { searchICD } from './searchICD.js';
     import aliasMap from './alias_map_skinpathology.json' assert { type: 'json' };
+    import icdList from './icd_list.json' assert { type: 'json' };
 
     const inputBox = document.getElementById('inputBox');
     const resultBox = document.getElementById('result');
     const suggestionBox = document.getElementById('suggestion');
     const copyMode = document.getElementById('copyMode');
+    const autocompleteList = document.getElementById('autocomplete-list');
 
     function displayResults(results) {
       resultBox.innerHTML = '';
@@ -47,22 +53,40 @@
     }
 
     function capitalizeWords(str) {
-      return str.replace(/\w+/g, w => w.charAt(0).toUpperCase() + w.slice(1));
+      return str.replace(/\b\w+/g, w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase());
     }
 
     function copyText(type) {
-      const results = searchICD(inputBox.value, copyMode.value === 'code' ? 'diagnosis' : 'location');
-      const values = results.map(res => type === 'code' ? res.code : res.diagnosis);
+      const results = searchICD(inputBox.value);
+      const values = results.map(res => type === 'code' ? res.code : capitalizeWords(res.diagnosis));
       const output = values.join('; ');
       navigator.clipboard.writeText(output).then(() => {
         alert(`${type === 'code' ? 'ICD codes' : 'Diagnosis'} copied to clipboard!`);
       });
     }
 
+    function updateAutocomplete(input) {
+      autocompleteList.innerHTML = '';
+      const cleanInput = input.toLowerCase();
+      if (!cleanInput) return;
+
+      const suggestions = icdList.filter(entry => entry.diagnosis.toLowerCase().includes(cleanInput));
+      for (const s of suggestions.slice(0, 10)) {
+        const item = document.createElement('div');
+        item.textContent = s.diagnosis;
+        item.classList.add('autocomplete-item');
+        item.onclick = () => {
+          inputBox.value = s.diagnosis;
+          updateSearch();
+          autocompleteList.innerHTML = '';
+        };
+        autocompleteList.appendChild(item);
+      }
+    }
+
     function updateSearch() {
       const inputVal = inputBox.value;
-      const mode = copyMode.value === 'code' ? 'diagnosis' : 'location';
-      const results = searchICD(inputVal, mode);
+      const results = searchICD(inputVal);
       displayResults(results);
 
       const firstResult = results[0];
@@ -80,15 +104,20 @@
       } else {
         suggestionBox.innerHTML = '';
       }
+
+      updateAutocomplete(inputVal);
     }
 
     inputBox.addEventListener('keydown', e => {
       if (e.key === 'Enter') {
         const target = copyMode.value;
         copyText(target);
-      } else {
-        updateSearch();
+        autocompleteList.innerHTML = '';
       }
+    });
+
+    inputBox.addEventListener('input', () => {
+      updateSearch();
     });
   </script>
 </body>

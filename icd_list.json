@@ -1,0 +1,42 @@
+[
+  {
+    "code": "L57.0",
+    "term": "Actinic keratosis"
+  },
+  {
+    "code": "C44.01",
+    "term": "Bowen's disease"
+  },
+  {
+    "code": "L90.5",
+    "term": "Fibroepithelial polyp"
+  },
+  {
+    "code": "C44.91",
+    "term": "Basal cell carcinoma, unspecified"
+  },
+  {
+    "code": "L81.4",
+    "term": "Postinflammatory hyperpigmentation"
+  },
+  {
+    "code": "C44.21",
+    "term": "Squamous cell carcinoma of skin of ear and external auricular canal"
+  },
+  {
+    "code": "L85.3",
+    "term": "Xerosis cutis"
+  },
+  {
+    "code": "D23.9",
+    "term": "Other benign neoplasm of skin, unspecified"
+  },
+  {
+    "code": "C43.9",
+    "term": "Malignant melanoma of skin, unspecified"
+  },
+  {
+    "code": "L70.0",
+    "term": "Acne vulgaris"
+  }
+]

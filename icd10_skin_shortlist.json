@@ -1,5 +1,61 @@
 [
   {
+    "name": "Actinic keratosis of scalp",
+    "code": "L57.0",
+    "keywords": [
+      "ak scalp",
+      "actinic keratosis scalp"
+    ]
+  },
+  {
+    "name": "Basal cell carcinoma of nose",
+    "code": "C44.311",
+    "keywords": [
+      "bcc nose",
+      "basal cell carcinoma nose"
+    ]
+  },
+  {
+    "name": "Basal cell carcinoma of cheek",
+    "code": "C44.310",
+    "keywords": [
+      "bcc cheek",
+      "basal cell carcinoma cheek"
+    ]
+  },
+  {
+    "name": "Seborrheic keratosis",
+    "code": "L82.1",
+    "keywords": [
+      "sk",
+      "seborrheic keratosis"
+    ]
+  },
+  {
+    "name": "Inflamed seborrheic keratosis",
+    "code": "L82.1",
+    "keywords": [
+      "isk",
+      "inflamed seborrheic keratosis"
+    ]
+  },
+  {
+    "name": "Squamous cell carcinoma of trunk",
+    "code": "C44.519",
+    "keywords": [
+      "scc trunk",
+      "squamous cell carcinoma trunk"
+    ]
+  },
+  {
+    "name": "Squamous cell carcinoma of hand",
+    "code": "C44.612",
+    "keywords": [
+      "scc hand",
+      "squamous cell carcinoma hand"
+    ]
+  },
+  {
     "name": "Basal cell carcinoma, nodular type of nose",
     "code": "C44.311",
     "keywords": [

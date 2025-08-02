@@ -86,7 +86,7 @@
         const copyDiagnosis = document.createElement("button");
         copyDiagnosis.className = "copy-btn";
         copyDiagnosis.textContent = "📋 Diagnosis";
-        copyDiagnosis.onclick = () => copyText(titleCase(m.name));
+        copyDiagnosis.onclick = () => copyText(titleCase(m.name.replace(/ of .+$/, '').trim()));
 
         const copyICD = document.createElement("button");
         copyICD.className = "copy-btn";

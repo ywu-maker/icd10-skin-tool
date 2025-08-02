@@ -2,123 +2,149 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ICD-10 Skin Pathology Search (v1.3)</title>
+  <title>ICD-10 Skin Pathology Tool v1.3.1</title>
   <style>
-    body { font-family: sans-serif; text-align: center; padding: 2rem; }
-    input, select, button { font-size: 1rem; margin: 0.5rem; padding: 0.5rem; }
-    #result { margin-top: 1rem; }
+    body { font-family: sans-serif; max-width: 720px; margin: 2rem auto; padding: 1rem; }
+    input, select { width: 100%; padding: 0.5rem; font-size: 1.1rem; margin-top: 0.5rem; }
+    ul { list-style: none; padding: 0; }
+    li { padding: 0.5rem; border-bottom: 1px solid #ddd; }
+    .entry { display: flex; justify-content: space-between; align-items: center; }
+    .text { flex: 1; }
+    button.copy-btn { margin-left: 8px; padding: 4px 8px; font-size: 0.9rem; }
+    .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
     #suggestion { color: gray; margin-top: 0.5rem; font-style: italic; cursor: pointer; }
-    #autocomplete-list { max-height: 150px; overflow-y: auto; border: 1px solid #ccc; margin-top: 5px; background: #fff; text-align: left; position: absolute; left: 50%; transform: translateX(-50%); width: 300px; }
-    .autocomplete-item { padding: 5px; cursor: pointer; }
-    .autocomplete-item:hover { background: #eee; }
   </style>
 </head>
 <body>
-  <h1>ICD-10 Skin Pathology Search (v1.3)</h1>
+  <h1>ICD-10 Skin Pathology Search (v1.3.1)</h1>
 
-  <label for="copyMode">Enter ↵ to copy:</label>
-  <select id="copyMode">
-    <option value="diagnosis">Diagnosis</option>
-    <option value="code">ICD Code</option>
-  </select><br>
+  <div class="topbar">
+    <label for="mode">Enter ↵ to copy:</label>
+    <select id="mode">
+      <option value="diagnosis">Diagnosis</option>
+      <option value="icd">ICD Code</option>
+    </select>
+  </div>
 
-  <input type="text" id="inputBox" placeholder="Enter diagnosis or location..." size="50"><br>
-
-  <button onclick="copyText('diagnosis')">📋 Diagnosis</button>
-  <button onclick="copyText('code')">📋 ICD Code</button>
-
+  <input id="search" placeholder="e.g., ak scalp or bcc nose..." autocomplete="off" />
   <div id="suggestion"></div>
-  <div id="autocomplete-list"></div>
-  <div id="result"></div>
+  <ul id="results"></ul>
 
-  <script type="module">
-    import { searchICD } from './searchICD.js';
-    import aliasMap from './alias_map_skinpathology.json' assert { type: 'json' };
-    import icdList from './icd_list.json' assert { type: 'json' };
+  <script>
+    let aliasMap = {};
+    let locationMap = {};
+    let icdData = [];
 
-    const inputBox = document.getElementById('inputBox');
-    const resultBox = document.getElementById('result');
-    const suggestionBox = document.getElementById('suggestion');
-    const copyMode = document.getElementById('copyMode');
-    const autocompleteList = document.getElementById('autocomplete-list');
+    function normalize(text) {
+      return text.toLowerCase().trim();
+    }
 
-    function displayResults(results) {
-      resultBox.innerHTML = '';
-      for (const res of results) {
-        const div = document.createElement('div');
-        div.textContent = `${res.diagnosis} → ${res.code}`;
-        resultBox.appendChild(div);
+    function titleCase(text) {
+      return text.split(' ').map(word =>
+        word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+      ).join(' ');
+    }
+
+    function fuzzyMatch(input, target) {
+      return target.toLowerCase().includes(input.toLowerCase());
+    }
+
+    function searchICD(input) {
+      const parts = input.toLowerCase().split(/[,;\s]+/);
+      let diag = "", loc = "";
+
+      for (let p of parts) {
+        if (aliasMap[p]) diag = aliasMap[p];
+        else if (locationMap[p]) loc = locationMap[p];
+        else if (!diag) diag = p;
+        else if (!loc) loc = p;
       }
+
+      return icdData.filter(entry =>
+        fuzzyMatch(diag, entry.name) && (!loc || fuzzyMatch(loc, entry.name))
+      );
     }
 
-    function capitalizeWords(str) {
-      return str.replace(/\b\w+/g, w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase());
-    }
-
-    function copyText(type) {
-      const results = searchICD(inputBox.value);
-      const values = results.map(res => type === 'code' ? res.code : capitalizeWords(res.diagnosis));
-      const output = values.join('; ');
-      navigator.clipboard.writeText(output).then(() => {
-        alert(`${type === 'code' ? 'ICD codes' : 'Diagnosis'} copied to clipboard!`);
+    function copyText(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        console.log("Copied:", text);
       });
     }
 
-    function updateAutocomplete(input) {
-      autocompleteList.innerHTML = '';
-      const cleanInput = input.toLowerCase();
-      if (!cleanInput) return;
+    function showResults(matches) {
+      const ul = document.getElementById("results");
+      ul.innerHTML = "";
+      matches.forEach(m => {
+        const li = document.createElement("li");
+        const container = document.createElement("div");
+        container.className = "entry";
 
-      const suggestions = icdList.filter(entry => entry.diagnosis.toLowerCase().includes(cleanInput));
-      for (const s of suggestions.slice(0, 10)) {
-        const item = document.createElement('div');
-        item.textContent = s.diagnosis;
-        item.classList.add('autocomplete-item');
-        item.onclick = () => {
-          inputBox.value = s.diagnosis;
+        const text = document.createElement("div");
+        text.className = "text";
+        text.textContent = titleCase(m.name) + " → " + m.code;
+
+        const copyDiagnosis = document.createElement("button");
+        copyDiagnosis.className = "copy-btn";
+        copyDiagnosis.textContent = "📋 Diagnosis";
+        copyDiagnosis.onclick = () => copyText(titleCase(m.name));
+
+        const copyICD = document.createElement("button");
+        copyICD.className = "copy-btn";
+        copyICD.textContent = "📎 ICD Code";
+        copyICD.onclick = () => copyText(m.code);
+
+        container.appendChild(text);
+        container.appendChild(copyDiagnosis);
+        container.appendChild(copyICD);
+        li.appendChild(container);
+        ul.appendChild(li);
+      });
+    }
+
+    function updateSuggestion(input) {
+      const suggestionBox = document.getElementById("suggestion");
+      const keys = Object.keys(aliasMap);
+      const guess = keys.find(k => k.includes(input.toLowerCase()));
+      if (guess && guess !== input.toLowerCase()) {
+        suggestionBox.innerHTML = `Did you mean: <strong>${guess}</strong>? Click to use.`;
+        suggestionBox.onclick = () => {
+          document.getElementById("search").value = guess;
           updateSearch();
-          autocompleteList.innerHTML = '';
         };
-        autocompleteList.appendChild(item);
+      } else {
+        suggestionBox.innerHTML = "";
       }
     }
 
     function updateSearch() {
-      const inputVal = inputBox.value;
-      const results = searchICD(inputVal);
-      displayResults(results);
-
-      const firstResult = results[0];
-      if (firstResult && firstResult.code === 'Not Found') {
-        const suggestion = Object.keys(aliasMap).find(k => k.includes(inputVal.toLowerCase()));
-        if (suggestion) {
-          suggestionBox.innerHTML = `Did you mean: <strong>${suggestion}</strong>? Click to use.`;
-          suggestionBox.onclick = () => {
-            inputBox.value = suggestion;
-            updateSearch();
-          };
-        } else {
-          suggestionBox.innerHTML = '';
-        }
-      } else {
-        suggestionBox.innerHTML = '';
-      }
-
-      updateAutocomplete(inputVal);
+      const input = document.getElementById("search").value;
+      const results = searchICD(input);
+      showResults(results);
+      updateSuggestion(input);
     }
 
-    inputBox.addEventListener('keydown', e => {
-      if (e.key === 'Enter') {
-        const target = copyMode.value;
-        copyText(target);
-        autocompleteList.innerHTML = '';
+    document.getElementById("search").addEventListener("input", updateSearch);
+
+    document.getElementById("search").addEventListener("keydown", e => {
+      if (e.key === "Enter") {
+        const input = document.getElementById("search").value;
+        const results = searchICD(input);
+        const mode = document.getElementById("mode").value;
+        if (results.length > 0) {
+          const item = results[0];
+          if (mode === "diagnosis") copyText(titleCase(item.name));
+          else if (mode === "icd") copyText(item.code);
+        }
       }
     });
 
-    inputBox.addEventListener('input', () => {
-      updateSearch();
-    });
+    async function loadData() {
+      aliasMap = await fetch('alias_map_skinpathology.json').then(res => res.json());
+      locationMap = await fetch('location_map_skinpathology.json').then(res => res.json());
+      icdData = await fetch('icd10_skin_shortlist.json').then(res => res.json());
+    }
+
+    loadData().then(updateSearch);
   </script>
 </body>
 </html>

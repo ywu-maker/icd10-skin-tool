@@ -1,166 +1,30 @@
 [
   {
-    "name": "Actinic Keratosis",
+    "name": "Actinic keratosis of scalp",
     "code": "L57.0"
   },
   {
-    "name": "Basal Cell Carcinoma",
-    "code": "C44.91"
+    "name": "Basal cell carcinoma of nose",
+    "code": "C44.311"
   },
   {
-    "name": "Seborrheic Keratosis",
+    "name": "Basal cell carcinoma of cheek",
+    "code": "C44.310"
+  },
+  {
+    "name": "Seborrheic keratosis",
     "code": "L82.1"
   },
   {
-    "name": "Inflamed Seborrheic Keratosis",
-    "code": "L82.0"
+    "name": "Inflamed seborrheic keratosis",
+    "code": "L82.1"
   },
   {
-    "name": "Squamous Cell Carcinoma",
-    "code": "C44.92"
+    "name": "Squamous cell carcinoma of trunk",
+    "code": "C44.519"
   },
   {
-    "name": "SCC In Situ",
-    "code": "D04.9"
-  },
-  {
-    "name": "Lentigo",
-    "code": "L81.4"
-  },
-  {
-    "name": "Lichen Simplex Chronicus",
-    "code": "L28.0"
-  },
-  {
-    "name": "Psoriasis",
-    "code": "L40.9"
-  },
-  {
-    "name": "Melanocytic Nevus",
-    "code": "D22.9"
-  },
-  {
-    "name": "Atypical Melanocytic Nevus",
-    "code": "D48.5"
-  },
-  {
-    "name": "Melanoma In Situ",
-    "code": "D03.9"
-  },
-  {
-    "name": "Malignant Melanoma",
-    "code": "C43.9"
-  },
-  {
-    "name": "Dermatofibroma",
-    "code": "D23.9"
-  },
-  {
-    "name": "Cyst",
-    "code": "L72.9"
-  },
-  {
-    "name": "Epidermal Inclusion Cyst",
-    "code": "L72.0"
-  },
-  {
-    "name": "Trichilemmal Cyst",
-    "code": "L72.11"
-  },
-  {
-    "name": "Milia",
-    "code": "L72.3"
-  },
-  {
-    "name": "Folliculitis",
-    "code": "L73.9"
-  },
-  {
-    "name": "Acne",
-    "code": "L70.9"
-  },
-  {
-    "name": "Rosacea",
-    "code": "L71.9"
-  },
-  {
-    "name": "Lichen Planus",
-    "code": "L43.9"
-  },
-  {
-    "name": "Granuloma Annulare",
-    "code": "L92.0"
-  },
-  {
-    "name": "Xanthoma",
-    "code": "E78.6"
-  },
-  {
-    "name": "Fibroepithelial Polyp",
-    "code": "L91.8"
-  },
-  {
-    "name": "Neurofibroma",
-    "code": "D36.1"
-  },
-  {
-    "name": "Angioma",
-    "code": "D18.01"
-  },
-  {
-    "name": "Pyogenic Granuloma",
-    "code": "L98.7"
-  },
-  {
-    "name": "Hemangioma",
-    "code": "D18.00"
-  },
-  {
-    "name": "Kaposi Sarcoma",
-    "code": "C46.9"
-  },
-  {
-    "name": "Mycosis Fungoides",
-    "code": "C84.0"
-  },
-  {
-    "name": "Lupus Erythematosus",
-    "code": "L93.0"
-  },
-  {
-    "name": "Sarcoidosis",
-    "code": "D86.3"
-  },
-  {
-    "name": "Tinea",
-    "code": "B35.9"
-  },
-  {
-    "name": "Scabies",
-    "code": "B86"
-  },
-  {
-    "name": "Wart",
-    "code": "B07.9"
-  },
-  {
-    "name": "Molluscum Contagiosum",
-    "code": "B08.1"
-  },
-  {
-    "name": "Contact Dermatitis",
-    "code": "L23.9"
-  },
-  {
-    "name": "Atopic Dermatitis",
-    "code": "L20.9"
-  },
-  {
-    "name": "Eczema",
-    "code": "L30.9"
-  },
-  {
-    "name": "Vasculitis",
-    "code": "L95.9"
+    "name": "Squamous cell carcinoma of hand",
+    "code": "C44.612"
   }
 ]

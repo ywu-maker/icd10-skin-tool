@@ -1,37 +1,32 @@
-# ICD-10 Skin Diagnosis Tool
+# ICD-10 Skin Pathology Lookup Tool
 
-A lightweight, offline-capable web tool for dermatopathology ICD-10 lookup.
+A lightweight, offline-capable ICD-10 code search tool designed for dermatopathology usage.  
+Built to improve diagnosis-to-code efficiency using fuzzy search, abbreviation expansion, and location mapping.
 
-## 🌐 Features
+## 🔧 Features
 
-- 📦 Offline ICD-10 skin diagnosis database (380+ entries)
-- 🔍 Fuzzy search with support for clinical abbreviations (e.g., "AK", "SCC in situ")
-- 🔁 Internal alias mapping for clinic-used terms → ICD-10 official names
-- 📋 Copy final diagnosis with code for pasting into reports or EMR
-- 💻 Runs directly in your browser (no backend, no internet required)
+- 🔍 Fuzzy search with abbreviation & location support
+- 🧠 Built-in mappings for common dermatopathology terms
+- 🔠 Title-cased diagnosis formatting (e.g., `ak` → `Actinic Keratosis`)
+- ⌨️ Press `Enter` to auto-copy diagnosis or ICD code
+- 📋 One-click buttons to copy either value
+- 📎 Works completely offline
 
-## 🧱 Included Files
+## 🗂 Files
 
-- `index.html` – Main web page
-- `icd_list.json` – ICD-10 codes & full diagnosis terms (skin-related only)
-- `alias_map.json` – Abbreviation → Official diagnosis mapping
+| File | Purpose |
+|------|---------|
+| `index_icd_skin_v1.1.2.html` | Main HTML web app |
+| `alias_map_skinpathology.json` | Abbreviation to diagnosis name mapping |
+| `location_map_skinpathology.json` | Location synonyms (e.g., `face` → `cheek`) |
+| `icd10_skin_shortlist.json` | Core data (diagnosis name + ICD-10 code) |
 
 ## 🚀 How to Use
 
-1. Open `index.html` in your browser
-2. Type diagnosis or abbreviation (e.g., `ak`, `pih`, `melanoma`)
-3. Click the result to copy ICD-10 code + diagnosis
+1. Upload all files to a GitHub repository
+2. Rename `index_icd_skin_v1.1.2.html` to `index.html` if deploying via GitHub Pages
+3. Enable GitHub Pages in the repository settings
+4. Access the tool at: `https://yourusername.github.io/your-repo-name/`
 
-## 🌍 Optional: Deploy to GitHub Pages
-
-- Go to **Settings → Pages**
-- Set source to `main` branch, folder = `/ (root)`
-- Access at: `https://yourusername.github.io/icd10-skin-tool/`
-
-## 📦 Version
-
-This is **v1.0** – stable offline tool with customizable data.
-
----
-
-Made with ❤️ for dermatopathology productivity.
+> This version: **v1.1.2**  
+> Developed with ❤️ for dermatopathology workflow optimization.

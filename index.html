@@ -1,71 +1,127 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ICD-10 Skin Tool v1.0</title>
+  <title>ICD-10 Skin Pathology Tool v1.1.2</title>
   <style>
-    body { font-family: sans-serif; max-width: 700px; margin: auto; padding: 2rem; }
-    input { width: 100%; padding: 0.5rem; font-size: 1rem; margin-bottom: 1rem; }
-    .result { border: 1px solid #ccc; padding: 1rem; margin-top: 0.5rem; border-radius: 6px; }
-    .code { font-weight: bold; color: #2c3e50; }
-    .term { font-size: 1.1rem; }
-    button { float: right; }
+    body { font-family: sans-serif; max-width: 720px; margin: 2rem auto; padding: 1rem; }
+    input, select { width: 100%; padding: 0.5rem; font-size: 1.1rem; margin-top: 0.5rem; }
+    ul { list-style: none; padding: 0; }
+    li { padding: 0.5rem; border-bottom: 1px solid #ddd; }
+    .entry { display: flex; justify-content: space-between; align-items: center; }
+    .text { flex: 1; }
+    button.copy-btn { margin-left: 8px; padding: 4px 8px; font-size: 0.9rem; }
+    .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
   </style>
 </head>
 <body>
-  <h1>ICD-10 Skin Diagnosis Tool</h1>
-  <input id="search" placeholder="Enter diagnosis or abbreviation..." />
-  <div id="results"></div>
+  <h1>ICD-10 Skin Pathology Search (v1.1.2)</h1>
+
+  <div class="topbar">
+    <label for="mode">Enter ↵ to copy:</label>
+    <select id="mode">
+      <option value="diagnosis">Diagnosis</option>
+      <option value="icd">ICD Code</option>
+    </select>
+  </div>
+
+  <input id="search" placeholder="e.g., ak scalp or bcc nose..." autocomplete="off" />
+  <ul id="results"></ul>
 
   <script>
-    let icdList = [];
     let aliasMap = {};
+    let locationMap = {};
+    let icdData = [];
 
     async function loadData() {
-      icdList = await fetch('icd_list.json').then(r => r.json());
-      aliasMap = await fetch('alias_map.json').then(r => r.json());
+      aliasMap = await fetch('alias_map_skinpathology.json').then(res => res.json());
+      locationMap = await fetch('location_map_skinpathology.json').then(res => res.json());
+      icdData = await fetch('icd10_skin_shortlist.json').then(res => res.json());
     }
 
-    function normalizeInput(input) {
-      const lower = input.trim().toLowerCase();
-      return aliasMap[lower] || input;
+    function normalize(text) {
+      return text.toLowerCase().trim();
+    }
+
+    function titleCase(text) {
+      return text.split(' ').map(word =>
+        word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+      ).join(' ');
+    }
+
+    function fuzzyMatch(input, target) {
+      return target.toLowerCase().includes(input.toLowerCase());
     }
 
     function searchICD(input) {
-      input = normalizeInput(input.toLowerCase());
-      const results = icdList.filter(entry =>
-        entry.term.toLowerCase().includes(input)
-      );
-      return results;
-    }
+      const parts = input.toLowerCase().split(/[,;\s]+/);
+      let diag = "", loc = "";
 
-    function renderResults(matches) {
-      const container = document.getElementById('results');
-      container.innerHTML = '';
-      if (matches.length === 0) {
-        container.innerHTML = '<p>No matches found.</p>';
-        return;
+      for (let p of parts) {
+        if (aliasMap[p]) diag = aliasMap[p];
+        else if (locationMap[p]) loc = locationMap[p];
+        else if (!diag) diag = p;
+        else if (!loc) loc = p;
       }
-      matches.forEach(match => {
-        const div = document.createElement('div');
-        div.className = 'result';
-        div.innerHTML = `
-          <span class="term">${match.term}</span><br>
-          <span class="code">ICD-10: ${match.code}</span>
-          <button onclick="navigator.clipboard.writeText('${match.code}')">Copy</button>
-        `;
-        container.appendChild(div);
+
+      return icdData.filter(entry => {
+        return fuzzyMatch(diag, entry.name) && (!loc || fuzzyMatch(loc, entry.name));
       });
     }
 
-    document.getElementById('search').addEventListener('input', e => {
-      const val = e.target.value;
-      if (val.length >= 2) {
-        const matches = searchICD(val);
-        renderResults(matches);
-      } else {
-        document.getElementById('results').innerHTML = '';
+    function copyText(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        console.log("Copied:", text);
+      });
+    }
+
+    function showResults(matches) {
+      const ul = document.getElementById("results");
+      ul.innerHTML = "";
+      matches.forEach(m => {
+        const li = document.createElement("li");
+        const container = document.createElement("div");
+        container.className = "entry";
+
+        const text = document.createElement("div");
+        text.className = "text";
+        text.textContent = titleCase(m.name) + " → " + m.code;
+
+        const copyDiagnosis = document.createElement("button");
+        copyDiagnosis.className = "copy-btn";
+        copyDiagnosis.textContent = "📋 Diagnosis";
+        copyDiagnosis.onclick = () => copyText(titleCase(m.name));
+
+        const copyICD = document.createElement("button");
+        copyICD.className = "copy-btn";
+        copyICD.textContent = "📎 ICD Code";
+        copyICD.onclick = () => copyText(m.code);
+
+        container.appendChild(text);
+        container.appendChild(copyDiagnosis);
+        container.appendChild(copyICD);
+        li.appendChild(container);
+        ul.appendChild(li);
+      });
+    }
+
+    document.getElementById("search").addEventListener("input", e => {
+      const input = e.target.value;
+      const results = searchICD(input);
+      showResults(results);
+    });
+
+    document.getElementById("search").addEventListener("keydown", e => {
+      if (e.key === "Enter") {
+        const input = e.target.value;
+        const results = searchICD(input);
+        const mode = document.getElementById("mode").value;
+        if (results.length > 0) {
+          const item = results[0];
+          if (mode === "diagnosis") copyText(titleCase(item.name));
+          else if (mode === "icd") copyText(item.code);
+        }
       }
     });
 

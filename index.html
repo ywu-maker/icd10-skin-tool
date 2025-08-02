@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>ICD-10 Skin Pathology Tool v1.3.1</title>
+  <meta charset="UTF-8" />
+  <title>ICD-10 Skin Pathology Tool v1.3.2</title>
   <style>
     body { font-family: sans-serif; max-width: 720px; margin: 2rem auto; padding: 1rem; }
     input, select { width: 100%; padding: 0.5rem; font-size: 1.1rem; margin-top: 0.5rem; }
@@ -16,7 +16,7 @@
   </style>
 </head>
 <body>
-  <h1>ICD-10 Skin Pathology Search (v1.3.1)</h1>
+  <h1>ICD-10 Skin Pathology Search (v1.3.2)</h1>
 
   <div class="topbar">
     <label for="mode">Enter ↵ to copy:</label>
@@ -26,7 +26,7 @@
     </select>
   </div>
 
-  <input id="search" placeholder="e.g., ak scalp or bcc nose..." autocomplete="off" />
+  <input id="search" placeholder="e.g., bcc nodular nose or scc ka hand..." autocomplete="off" />
   <div id="suggestion"></div>
   <ul id="results"></ul>
 
@@ -51,18 +51,18 @@
 
     function searchICD(input) {
       const parts = input.toLowerCase().split(/[,;\s]+/);
-      let diag = "", loc = "";
+      let searchTokens = [];
 
       for (let p of parts) {
-        if (aliasMap[p]) diag = aliasMap[p];
-        else if (locationMap[p]) loc = locationMap[p];
-        else if (!diag) diag = p;
-        else if (!loc) loc = p;
+        if (aliasMap[p]) searchTokens.push(aliasMap[p].toLowerCase());
+        else if (locationMap[p]) searchTokens.push(locationMap[p].toLowerCase());
+        else searchTokens.push(p);
       }
 
-      return icdData.filter(entry =>
-        fuzzyMatch(diag, entry.name) && (!loc || fuzzyMatch(loc, entry.name))
-      );
+      return icdData.filter(entry => {
+        const combined = (entry.name + " " + (entry.keywords || []).join(" ")).toLowerCase();
+        return searchTokens.every(token => combined.includes(token));
+      });
     }
 
     function copyText(text) {

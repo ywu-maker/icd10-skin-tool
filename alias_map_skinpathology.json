@@ -1,7 +1,14 @@
 {
   "ak": "Actinic keratosis",
   "bcc": "Basal cell carcinoma",
+  "nt": "nodular type",
+  "st": "superficial type",
   "scc": "Squamous cell carcinoma",
+  "ka": "keratoacanthoma",
   "sk": "Seborrheic keratosis",
-  "isk": "Inflamed seborrheic keratosis"
+  "isk": "Inflamed seborrheic keratosis",
+  "bcc nodular": "Basal cell carcinoma, nodular type",
+  "bcc superficial": "Basal cell carcinoma, superficial type",
+  "scc ka": "Squamous cell carcinoma, keratoacanthoma type",
+  "sk irritated": "Seborrheic keratosis, irritated type"
 }
